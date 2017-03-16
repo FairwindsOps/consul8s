@@ -1,6 +1,8 @@
 Consul8s
 ========
 
+[![Docker Repository on Quay](https://quay.io/repository/reactiveops/consul8s/status "Docker Repository on Quay")](https://quay.io/repository/reactiveops/consul8s)
+
 Consul8s is a tool (currently in development) that retrieves services from
 Consul and creates Kubernetes Services. This allows a pod deployed in
 Kubernetes to request a single DNS/ClusterIP record and load balance across the
