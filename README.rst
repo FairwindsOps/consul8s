@@ -84,3 +84,15 @@ spec:
       port: 80
 
 ```
+
+Installation
+------------
+
+    pip install consul
+
+Usage
+-----
+
+To use it:
+
+    $ consul8s --help
