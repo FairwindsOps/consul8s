@@ -25,8 +25,10 @@ def create_endpoint_doc(service, endpoints, port):
 
 def ports_from_service_ports(service_ports, port):
     # Right now only support 1 port per service :(
-    service_port = service_ports[0]
-    port_def = {"port": port}
-    if 'name' in service_port:
-        port_def['name'] = service_port['name']
-    return [port_def]
+    ports = []
+    for service_port in service_ports:
+        port_def = {"port": port}
+        if 'name' in service_port:
+            port_def['name'] = service_port['name']
+        ports.append(port_def)
+    return ports

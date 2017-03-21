@@ -98,3 +98,8 @@ Usage
 To use it:
 
     $ consul8s --help
+
+Metrics
+^^^^^^^
+
+Metric collection can be enabled via the `--prometheus` option for reporting metrics via a Prometheus Push Gateway.

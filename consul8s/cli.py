@@ -6,7 +6,7 @@ import click
 import pykube
 
 from consul8s import kube_generation
-
+from consul8s import prometheus_metrics
 
 
 @click.command()
@@ -14,7 +14,8 @@ from consul8s import kube_generation
 @click.option('--namespace', '-n', default='default', help='namespace to search')
 @click.option('--interval', '-i', default='60', help='Interval between loops')
 @click.option('--run-once', '-1', is_flag=True, help='Run once instead of looping forever')
-def main(kube_config_path, namespace, interval, run_once):
+@click.option('--prometheus', '-p', default=None, help='Location of a Prometheus push gateway')
+def main(kube_config_path, namespace, interval, run_once, prometheus):
     """Consul integration with Kubernetes"""
     if kube_config_path:
         config = pykube.KubeConfig.from_file(kube_config_path)
@@ -22,12 +23,16 @@ def main(kube_config_path, namespace, interval, run_once):
         config = pykube.KubeConfig.from_service_account()
     api = pykube.HTTPClient(config)
 
+    metrics = prometheus_metrics.PrometheusMetrics(prometheus)
+
     if run_once:
         evaluate(api, namespace)
     else:
         while True:
             evaluate(api, namespace)
             time.sleep(int(interval))
+            metrics.push_and_clear_metrics()
+
 
 def evaluate(api, namespace):
     services = pykube.Service.objects(api).filter(namespace=namespace,
@@ -46,6 +51,7 @@ def evaluate(api, namespace):
         except pykube.exceptions.HTTPError:
             pykube.Endpoint(api, doc).create()
             click.echo('Created endpoints')
+
 
 def get_consul_endpoints_for_service(HTTP, host, service):
     # Fake this for now until we can test against a consul setup

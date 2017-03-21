@@ -42,6 +42,23 @@ class TestCreateEndpointDoc(unittest.TestCase):
         self.assertEqual(self.port, doc['subsets'][0]['ports'][0]['port'])
         self.assertNotIn('name', doc['subsets'][0]['ports'][0])
 
+    def test_multiple_named_ports(self):
+        ports = [
+            {'name': 'foo2',
+            'port': 82},
+            {'name': 'foo3',
+            'port': 83}]
+        self.service.obj = self._service_obj(ports=ports)
+        endpoints = [mock.Mock(), mock.Mock]
+        addresses = [{'ip': ip} for ip in endpoints]
+
+        doc = self.fut(self.service, endpoints, self.port)
+
+        self.assertEqual(self.port, doc['subsets'][0]['ports'][0]['port'])
+        self.assertEqual('foo2', doc['subsets'][0]['ports'][0]['name'])
+        self.assertEqual('foo3', doc['subsets'][0]['ports'][1]['name'])
+
+
     def _service_obj(self, ports=None):
         if ports is None:
             ports =  [{'name': 'http',
