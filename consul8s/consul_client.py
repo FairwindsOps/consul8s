@@ -33,4 +33,4 @@ class ConsulClient(object):
         return (addresses, port)
 
     def _url_for_service(self, service):
-        return '{0}/v1/catalog/service/{1}'.format(self._base_url, service)
+        return '{0}/v1/catalog/service/{1}?passing'.format(self._base_url, service)

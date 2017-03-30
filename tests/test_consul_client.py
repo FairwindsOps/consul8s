@@ -21,7 +21,7 @@ class TestGettingActiveEndpointForService(unittest.TestCase):
     def test_service_with_no_endpoints(self):
         self.http.get.return_value.json.return_value = []
         service = 'foo'
-        url = self.base_url + '/v1/catalog/service/' + service
+        url = self.base_url + '/v1/catalog/service/' + service + "?passing"
 
         returned = self.cc.get_active_endpoints_for_service(service)
 
@@ -33,7 +33,7 @@ class TestGettingActiveEndpointForService(unittest.TestCase):
         instance = self._consul_service_instance()
         self.http.get.return_value.json.return_value = [instance]
         service = 'foo'
-        url = self.base_url + '/v1/catalog/service/' + service
+        url = self.base_url + '/v1/catalog/service/' + service + "?passing"
 
         returned = self.cc.get_active_endpoints_for_service(service)
 
@@ -46,7 +46,7 @@ class TestGettingActiveEndpointForService(unittest.TestCase):
         instance_2 = self._consul_service_instance('10.0.0.2')
         self.http.get.return_value.json.return_value = [instance_1, instance_2]
         service = 'foo'
-        url = self.base_url + '/v1/catalog/service/' + service
+        url = self.base_url + '/v1/catalog/service/' + service + "?passing"
 
         returned = self.cc.get_active_endpoints_for_service(service)
 
