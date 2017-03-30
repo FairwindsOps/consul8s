@@ -14,7 +14,7 @@ from consul8s import prometheus_metrics
 @click.option('--namespace', '-n', default='default', help='namespace to search')
 @click.option('--interval', '-i', default='60', help='Interval between loops')
 @click.option('--run-once', '-1', is_flag=True, help='Run once instead of looping forever')
-@click.option('--prometheus', '-p', default=None, help='Location of a Prometheus push gateway')
+@click.option('--prometheus', '-p', is_flag=True, help='Enable Prometheus metrics')
 def main(kube_config_path, namespace, interval, run_once, prometheus):
     """Consul integration with Kubernetes"""
     if kube_config_path:
@@ -26,12 +26,13 @@ def main(kube_config_path, namespace, interval, run_once, prometheus):
     metrics = prometheus_metrics.PrometheusMetrics(prometheus)
 
     if run_once:
-        evaluate(api, namespace)
+        with metrics.eval_timer.time():
+            evaluate(api, namespace)
     else:
         while True:
-            evaluate(api, namespace)
+            with metrics.eval_timer.time():
+                evaluate(api, namespace)
             time.sleep(int(interval))
-            metrics.push_and_clear_metrics()
 
 
 def evaluate(api, namespace):

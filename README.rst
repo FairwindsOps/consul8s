@@ -102,4 +102,4 @@ To use it:
 Metrics
 ^^^^^^^
 
-Metric collection can be enabled via the `--prometheus` option for reporting metrics via a Prometheus Push Gateway.
+Metric collection can be enabled via the `--prometheus` option for hosting metrics at port `8000`.
