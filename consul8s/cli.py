@@ -27,18 +27,20 @@ def main(kube_config_path, namespace, interval, run_once, prometheus):
 
     if run_once:
         with metrics.eval_timer.time():
-            evaluate(api, namespace)
+            evaluate(api, namespace, metrics)
     else:
         while True:
             with metrics.eval_timer.time():
-                evaluate(api, namespace)
+                evaluate(api, namespace, metrics)
             time.sleep(int(interval))
 
 
-def evaluate(api, namespace):
+def evaluate(api, namespace, metrics):
     services = pykube.Service.objects(api).filter(namespace=namespace,
                                                   selector={'consul8s_source': 'consul'})
-    click.echo('Found {0} services'.format(len(services)))
+    number_of_services = len(services)
+    metrics.number_of_consul_sourced_services.set(number_of_services)
+    click.echo('Found {0} services'.format(number_of_services))
     for service in services:
         click.echo('Service: {0}'.format(service.name))
         click.echo('Getting endpoints')
