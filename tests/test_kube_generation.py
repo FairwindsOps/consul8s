@@ -15,7 +15,7 @@ class TestCreateEndpointDoc(unittest.TestCase):
         self.fut = kube_generation.create_endpoint_doc
 
     def test_endpoints_are_addresses(self):
-        endpoints = [([mock.Mock(), mock.Mock], self.port)]
+        endpoints = [([mock.Mock(), mock.Mock()], self.port)]
         addresses = [{'ip': ip} for ip in endpoints[0][0]]
 
         doc = self.fut(self.service, endpoints)
@@ -24,7 +24,7 @@ class TestCreateEndpointDoc(unittest.TestCase):
 
     def test_ports_from_endpoints(self):
         self.service.obj = self._service_obj()
-        endpoints = [([mock.Mock(), mock.Mock], self.port)]
+        endpoints = [([mock.Mock(), mock.Mock()], self.port)]
         addresses = [{'ip': ip} for ip in endpoints[0][0]]
 
         doc = self.fut(self.service, endpoints)
@@ -34,7 +34,7 @@ class TestCreateEndpointDoc(unittest.TestCase):
 
     def test_unnamed_port(self):
         self.service.obj = self._service_obj(ports=[{'port': 81}])
-        endpoints = [([mock.Mock(), mock.Mock], self.port)]
+        endpoints = [([mock.Mock(), mock.Mock()], self.port)]
         addresses = [{'ip': ip} for ip in endpoints[0][0]]
 
         doc = self.fut(self.service, endpoints)
@@ -49,7 +49,7 @@ class TestCreateEndpointDoc(unittest.TestCase):
             {'name': 'foo3',
             'port': 83}]
         self.service.obj = self._service_obj(ports=ports)
-        endpoints = [([mock.Mock(), mock.Mock], self.port)]
+        endpoints = [([mock.Mock(), mock.Mock()], self.port)]
         addresses = [{'ip': ip} for ip in endpoints[0][0]]
 
         doc = self.fut(self.service, endpoints)
