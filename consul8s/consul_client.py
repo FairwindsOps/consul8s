@@ -30,7 +30,7 @@ class ConsulClient(object):
             addresses.append(service['Address'])
             port = service['ServicePort']
 
-        return (addresses, port)
+        return [(addresses, port)]
 
     def _url_for_service(self, service):
         return '{0}/v1/catalog/service/{1}?passing'.format(self._base_url, service)

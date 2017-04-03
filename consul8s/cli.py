@@ -44,9 +44,9 @@ def evaluate(api, namespace, metrics):
     for service in services:
         click.echo('Service: {0}'.format(service.name))
         click.echo('Getting endpoints')
-        (endpoints, port) = get_consul_endpoints_for_service(None, None, service)
+        endpoints = get_consul_endpoints_for_service(None, None, service)
         click.echo('Found endpoints {0}'.format(endpoints))
-        doc = kube_generation.create_endpoint_doc(service, endpoints, port)
+        doc = kube_generation.create_endpoint_doc(service, endpoints)
         click.echo('Creating endpoint {0}'.format(doc))
         try:
             pykube.Endpoint(api, doc).update()
@@ -67,6 +67,7 @@ def get_consul_endpoints_for_service(HTTP, host, service):
         '10.2.5.1',
         '10.1.6.1',
     ]
-    return (random.sample(endpoints, 3), 9376)
+    return [(random.sample(endpoints, 3), 9376),
+            (random.sample(endpoints, 2), 9378)]
 
 

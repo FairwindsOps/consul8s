@@ -27,7 +27,7 @@ class TestGettingActiveEndpointForService(unittest.TestCase):
 
         self.http.get.assert_called_once_with(url, timeout=60)
 
-        self.assertEqual(([], None), returned)
+        self.assertEqual([([], None)], returned)
 
     def test_service_with_a_single_endpoint(self):
         instance = self._consul_service_instance()
@@ -39,7 +39,7 @@ class TestGettingActiveEndpointForService(unittest.TestCase):
 
         self.http.get.assert_called_once_with(url, timeout=60)
 
-        self.assertEqual(([instance['Address']], instance['ServicePort']), returned)
+        self.assertEqual([([instance['Address']], instance['ServicePort'])], returned)
 
     def test_service_with_multiple_endpoints(self):
         instance_1 = self._consul_service_instance('10.0.0.1')
@@ -52,8 +52,8 @@ class TestGettingActiveEndpointForService(unittest.TestCase):
 
         self.http.get.assert_called_once_with(url, timeout=60)
 
-        self.assertEqual(([instance_1['Address'],
-                           instance_2['Address']], instance_2['ServicePort']),
+        self.assertEqual([([instance_1['Address'],
+                           instance_2['Address']], instance_2['ServicePort'])],
                          returned)
 
     def test_service_timeout_to_consul(self):
