@@ -4,7 +4,9 @@ import time
 
 import click
 import pykube
+import requests
 
+from consul8s import consul_client
 from consul8s import kube_generation
 from consul8s import prometheus_metrics
 
@@ -15,7 +17,8 @@ from consul8s import prometheus_metrics
 @click.option('--interval', '-i', default='60', help='Interval between loops')
 @click.option('--run-once', '-1', is_flag=True, help='Run once instead of looping forever')
 @click.option('--prometheus', '-p', is_flag=True, help='Enable Prometheus metrics')
-def main(kube_config_path, namespace, interval, run_once, prometheus):
+@click.option('--consul', '-c', default='localhost:8500', help='Hostname:Port of Consul')
+def main(kube_config_path, namespace, interval, run_once, prometheus, consul):
     """Consul integration with Kubernetes"""
     if kube_config_path:
         config = pykube.KubeConfig.from_file(kube_config_path)
@@ -24,6 +27,8 @@ def main(kube_config_path, namespace, interval, run_once, prometheus):
     api = pykube.HTTPClient(config)
 
     metrics = prometheus_metrics.PrometheusMetrics(prometheus)
+    consul_url = 'http://{0}'.format(consul)
+    cclient = consul_client.ConsulClient(requests, consul_url, click.echo)
 
     if run_once:
         with metrics.eval_timer.time():
@@ -31,11 +36,11 @@ def main(kube_config_path, namespace, interval, run_once, prometheus):
     else:
         while True:
             with metrics.eval_timer.time():
-                evaluate(api, namespace, metrics)
+                evaluate(api, namespace, metrics, cclient)
             time.sleep(int(interval))
 
 
-def evaluate(api, namespace, metrics):
+def evaluate(api, namespace, metrics, consul):
     services = pykube.Service.objects(api).filter(namespace=namespace,
                                                   selector={'consul8s_source': 'consul'})
     number_of_services = len(services)
@@ -44,7 +49,7 @@ def evaluate(api, namespace, metrics):
     for service in services:
         click.echo('Service: {0}'.format(service.name))
         click.echo('Getting endpoints')
-        endpoints = get_consul_endpoints_for_service(None, None, service)
+        endpoints = consul.get_active_endpoints_for_service(service.name)
         click.echo('Found endpoints {0}'.format(endpoints))
         doc = kube_generation.create_endpoint_doc(service, endpoints)
         click.echo('Creating endpoint {0}'.format(doc))
