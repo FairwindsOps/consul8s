@@ -1,0 +1,5 @@
+requests==2.13.0
+pykube==0.15.0
+click
+ipaddress
+prometheus-client==0.0.19

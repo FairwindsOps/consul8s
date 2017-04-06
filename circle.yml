@@ -1,0 +1,29 @@
+---
+machine:
+  services:
+    - docker
+
+  environment:
+    PATH: $PATH:node_modules/.bin
+    CI_SHA1: $CIRCLE_SHA1
+    CI_BRANCH: $CIRCLE_BRANCH
+    CI_TAG: $CIRCLE_TAG
+    CI_BUILD_NUM: $CIRCLE_BUILD_NUM
+
+
+dependencies:
+  pre:
+    - npm install
+    - docker-build -f quay.config
+    - pip install -r requirements.txt -r test-requirements.txt
+
+test:
+  override:
+    - pytest
+
+deployment:
+  docker_image:
+    branch: /.*/
+    commands:
+      - docker login -e test@example.com -u $DOCKER_USER -p $DOCKER_PASS quay.io
+      - docker-push -f quay.config

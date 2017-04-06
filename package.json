@@ -1,0 +1,14 @@
+{
+  "name": "consul8s",
+  "version": "0.0.0",
+  "description": "Consul/Kube integration",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reactiveops/consul8s.git"
+  },
+  "author": "ReactiveOps",
+  "license": "Apache2",
+  "dependencies": {
+    "k8s-scripts": "git://github.com/reactiveops/k8s-scripts.git#pc/4"
+  }
+}
