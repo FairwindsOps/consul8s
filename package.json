@@ -9,6 +9,6 @@
   "author": "ReactiveOps",
   "license": "Apache2",
   "dependencies": {
-    "k8s-scripts": "git://github.com/reactiveops/k8s-scripts.git#pc/4"
+    "k8s-scripts": "git://github.com/reactiveops/k8s-scripts.git#v4.0.1"
   }
 }
