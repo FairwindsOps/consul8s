@@ -32,20 +32,23 @@ def main(kube_config_path, namespace, interval, run_once, prometheus, consul):
 
     if run_once:
         with metrics.eval_timer.time():
-            evaluate(api, namespace, metrics)
+            evaluate_for_endpoints(api, namespace, metrics, cclient)
+            evaluate_for_registration(api, namespace, metrics, cclient)
     else:
         while True:
             with metrics.eval_timer.time():
-                evaluate(api, namespace, metrics, cclient)
+                evaluate_for_endpoints(api, namespace, metrics, cclient)
+                evaluate_for_registration(api, namespace, metrics, cclient)
             time.sleep(int(interval))
 
 
-def evaluate(api, namespace, metrics, consul):
+def evaluate_for_endpoints(api, namespace, metrics, consul):
+    """Updated Kube services with endpoints from consul"""
     services = pykube.Service.objects(api).filter(namespace=namespace,
                                                   selector={'consul8s_source': 'consul'})
     number_of_services = len(services)
     metrics.number_of_consul_sourced_services.set(number_of_services)
-    click.echo('Found {0} services'.format(number_of_services))
+    click.echo('Found {0} services needing kube endpoints'.format(number_of_services))
     for service in services:
         click.echo('Service: {0}'.format(service.name))
         click.echo('Getting endpoints')
@@ -59,6 +62,18 @@ def evaluate(api, namespace, metrics, consul):
         except pykube.exceptions.HTTPError:
             pykube.Endpoint(api, doc).create()
             click.echo('Created endpoints')
+
+def evaluate_for_registration(api, namespace, metrics, consul):
+    """Registers kube ELBs into Consul as a service"""
+    services = pykube.Service.objects(api).filter(namespace=namespace,
+                                                  selector={'consul8s_source': 'kubernetes'})
+    number_of_services = len(services)
+    metrics.number_of_kubernetes_sourced_services.set(number_of_services)
+    click.echo('Found {0} services for consul registration'.format(number_of_services))
+    for service in services:
+        click.echo('Service: {0}'.format(service.name))
+        click.echo('Ensuring it exists in Consul')
+        consul_service = consul.ensure_kube_service_registered(service.obj)
 
 
 def get_consul_endpoints_for_service(HTTP, host, service):

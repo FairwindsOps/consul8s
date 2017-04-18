@@ -64,8 +64,16 @@ migrate applications over, then remove the old port. This isn't ideal though.
 Creating Consul Service Based on Kubernetes Services
 ----------------------------------------------------
 
-It will be possible to register Kubernetes services into consul. This will rely
-on a DNS record created out-of-band or via the [route53-kubernetes](https://github.com/wearemolecule/route53-kubernetes) mapping service.
+It is possible to register Kubernetes services into consul. This will rely on a
+DNS record created out-of-band or via the
+[route53-kubernetes](https://github.com/wearemolecule/route53-kubernetes)
+mapping service.
+
+* `consul8s_source` must be set to `kubernetes` .
+* `consul8s/service.name` is the name of the service in Consul.
+* `consul8s/service.port_name` is the port name in this manifest to register in Consul. The port number will be looked up via this name.
+* `domainName` is the name being registered into Consul.
+
 
 ```
 ---
@@ -79,6 +87,7 @@ metadata:
     dns: route53
   annotations:
     consul8s/service.name: foo
+    consul8s/service.port_name: http
     domainName: foo.example.com
 spec:
   ports:
