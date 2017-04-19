@@ -28,7 +28,7 @@ deployment:
       - docker login -e test@example.com -u $DOCKER_USER -p $DOCKER_PASS quay.io
       - docker-push -f quay.config
   tagged_release:
-    branch: /v.*/
+    tag: /v.*/
     commands:
       - docker login -e test@example.com -u $DOCKER_USER -p $DOCKER_PASS quay.io
       - docker-push -f quay.config
