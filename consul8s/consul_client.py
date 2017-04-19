@@ -70,7 +70,6 @@ class ConsulClient(object):
             self._output('HTTP Error {0}'.format(str(e)))
             raise ConsulClientRequestException(e)
 
-
     def _doc_from_manifest(self, service_manifest, func):
         """Creates a doc from a Kube manifest.
 
@@ -82,19 +81,20 @@ class ConsulClient(object):
 
         endpoint = service_metadata['annotations']['domainName']
         consul_name = service_metadata['annotations']['consul8s/service.name']
+        service_id = service_metadata['annotations'].get('consul8s/service.id', consul_name)
         port_name = service_metadata['annotations']['consul8s/service.port_name']
 
         port_number = self._port_number_from_name(service_spec['ports'], port_name)
 
-        doc = func(consul_name, endpoint, port_number)
+        doc = func(consul_name, service_id, endpoint, port_number)
         return doc
 
-    def _consul_registration_doc(self, service, address, port):
+    def _consul_registration_doc(self, service, service_id, address, port):
         doc = {
             'Node': 'Kubernetes',
             'Address': address,
             'Service': {
-                'ID': service,
+                'ID': service_id,
                 'Service': service,
                 'Address': address,
                 'Port': port,
@@ -102,13 +102,12 @@ class ConsulClient(object):
         }
         return doc
 
-    def _consul_deregistration_doc(self, service, address, port):
+    def _consul_deregistration_doc(self, service, service_id, address, port):
         doc = {
             'Node': 'Kubernetes',
-            'ServiceID': service,
+            'ServiceID': service_id,
         }
         return doc
-
 
     def _url_for_service(self, service):
         return '{0}/v1/catalog/service/{1}?passing'.format(self._base_url, service)

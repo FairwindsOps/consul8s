@@ -74,6 +74,7 @@ Label:
 
 Annotations:
 * `consul8s/service.name` is the name of the service in Consul.
+* `consul8s/service.id` The Consul ServiceID. Defaults to the `consul8s/service.name` if not specified.
 * `consul8s/service.port_name` is the port name in this manifest to register in Consul. The port number will be looked up via this name.
 * `domainName` is the name being registered into Consul.
 
