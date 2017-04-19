@@ -12,3 +12,7 @@ class PrometheusMetrics(object):
         self.number_of_consul_sourced_services = pc.Gauge(
             'number_of_consul_sourced_services',
             'Number of services in Kubernetes that rely on endpoint data from Consul')
+
+        self.number_of_kubernetes_sourced_services = pc.Gauge(
+            'number_of_kubernetes_sourced_services',
+            'Number of services in Kubernetes that are synced to Consul')

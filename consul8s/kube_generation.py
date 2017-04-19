@@ -26,7 +26,6 @@ def create_subsets_doc(service_ports, endpoints):
     """
     subsets = []
     for ips, port in endpoints:
-        print port
         addresses = [{'ip': ip} for ip in ips]
         ports = ports_from_service_ports(service_ports, port)
         subsets.append({
