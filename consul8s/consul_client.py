@@ -37,21 +37,30 @@ class ConsulClient(object):
 
         - service_manifest: manifest of a Kubernetes service
         """
-        service_metadata = service_manifest['metadata']
-        service_spec = service_manifest['spec']
-
-        endpoint = service_metadata['annotations']['domainName']
-        consul_name = service_metadata['annotations']['consul8s/service.name']
-        port_name = service_metadata['annotations']['consul8s/service.port_name']
-
-        port_number = self._port_number_from_name(service_spec['ports'], port_name)
-
-        doc = self._consul_registration_doc(consul_name, endpoint, port_number)
+        doc = self._doc_from_manifest(service_manifest, self._consul_registration_doc)
         self._output(doc)
         url = self._url_for_catalog_registration()
+        self._put(url, doc)
 
+    def ensure_kube_service_deregistered(self, service_manifest):
+        """Deregisters a Kube service registration from Consul
+
+        - service_manifest: manifest of a Kubernetes service
+        """
+        doc = self._doc_from_manifest(service_manifest, self._consul_deregistration_doc)
+        self._output(doc)
+        url = self._url_for_catalog_deregistration()
+        self._put(url, doc)
+
+    def _port_number_from_name(self, ports, name):
+        for port in ports:
+            if port['name'] == name:
+                return port['port']
+        raise Exception('No port with name {0}'.format(name))
+
+    def _put(self, url, data):
         try:
-            resp = self._http.put(url, timeout=60, json=doc)
+            resp = self._http.put(url, timeout=60, json=data)
         except requests.exceptions.Timeout as e:
             self._output('Timeout connecting to Consul')
             raise ConsulClientRequestException(e)
@@ -61,11 +70,24 @@ class ConsulClient(object):
             self._output('HTTP Error {0}'.format(str(e)))
             raise ConsulClientRequestException(e)
 
-    def _port_number_from_name(self, ports, name):
-        for port in ports:
-            if port['name'] == name:
-                return port['port']
-        raise Exception('No port with name {0}'.format(name))
+
+    def _doc_from_manifest(self, service_manifest, func):
+        """Creates a doc from a Kube manifest.
+
+        `service_manifest` has properties extracted then applied to `func`. The
+        result of `func` is returned.
+        """
+        service_metadata = service_manifest['metadata']
+        service_spec = service_manifest['spec']
+
+        endpoint = service_metadata['annotations']['domainName']
+        consul_name = service_metadata['annotations']['consul8s/service.name']
+        port_name = service_metadata['annotations']['consul8s/service.port_name']
+
+        port_number = self._port_number_from_name(service_spec['ports'], port_name)
+
+        doc = func(consul_name, endpoint, port_number)
+        return doc
 
     def _consul_registration_doc(self, service, address, port):
         doc = {
@@ -80,9 +102,19 @@ class ConsulClient(object):
         }
         return doc
 
+    def _consul_deregistration_doc(self, service, address, port):
+        doc = {
+            'Node': 'Kubernetes',
+            'ServiceID': service,
+        }
+        return doc
+
 
     def _url_for_service(self, service):
         return '{0}/v1/catalog/service/{1}?passing'.format(self._base_url, service)
 
     def _url_for_catalog_registration(self):
         return '{0}/v1/catalog/register'.format(self._base_url)
+
+    def _url_for_catalog_deregistration(self):
+        return '{0}/v1/catalog/deregister'.format(self._base_url)

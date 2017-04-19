@@ -69,10 +69,17 @@ DNS record created out-of-band or via the
 [route53-kubernetes](https://github.com/wearemolecule/route53-kubernetes)
 mapping service.
 
+Label:
 * `consul8s_source` must be set to `kubernetes` .
+
+Annotations:
 * `consul8s/service.name` is the name of the service in Consul.
 * `consul8s/service.port_name` is the port name in this manifest to register in Consul. The port number will be looked up via this name.
 * `domainName` is the name being registered into Consul.
+
+Removing the Kubernetes service *will not* remove the Consul registration.
+
+Removing the Consul service can be done with an annotation of `consul8s/service.remove_registration: true`. This will remove the registration in Consul to allow the service to drain.
 
 
 ```

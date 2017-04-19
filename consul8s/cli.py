@@ -72,8 +72,13 @@ def evaluate_for_registration(api, namespace, metrics, consul):
     click.echo('Found {0} services for consul registration'.format(number_of_services))
     for service in services:
         click.echo('Service: {0}'.format(service.name))
-        click.echo('Ensuring it exists in Consul')
-        consul_service = consul.ensure_kube_service_registered(service.obj)
+        remove_service = service.obj['metadata']['annotations'].get('consul8s/service.remove_registration', 'false').lower() == 'true'
+        if remove_service:
+            click.echo('Ensuring it doesn\'t exist in Consul')
+            consul.ensure_kube_service_deregistered(service.obj)
+        else:
+            click.echo('Ensuring it exists in Consul')
+            consul.ensure_kube_service_registered(service.obj)
 
 
 def get_consul_endpoints_for_service(HTTP, host, service):
