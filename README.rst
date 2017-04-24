@@ -118,7 +118,25 @@ To use it:
 
     $ consul8s --help
 
+Monitoring
+----------
+
+Consul8s tries to fail quickly and exit in the event of errors, relying on
+Kubernetes to restart the process. Simple monitoring can be that Consul8s has
+not restarted recently and has run for a multiple of the `--interval`. This is
+helpful although may not be sufficient (in the event that the Consul8s process
+hangs).
+
+Metrics can be used to ensure that Consul8s is actually processing properly.
+
 Metrics
 ^^^^^^^
 
 Metric collection can be enabled via the `--prometheus` option for hosting metrics at port `8000`.
+
+The `loop_time_seconds` metric can be used to monitor that Consul8s has
+evaluated Kubernetes services in a timely manner.
+
+A derivative of `loop_time_seconds_count` will let you know that this has succeeded recently.
+
+An alert similar to "`loop_time_seconds_count` > N" may also be useful.
