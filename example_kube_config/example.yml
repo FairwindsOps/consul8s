@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ReplicationController
 metadata:
-  namespace: development
+  namespace: staging
   name: consul8s
 spec:
   replicas: 1
@@ -15,10 +15,38 @@ spec:
     spec:
       containers:
         - name: consul8s
-          command: ["/usr/local/bin/consul8s", "--namespace", "development"]
-          image: quay.io/reactiveops/consul8s:master
+          command: ["/usr/local/bin/consul8s", "--namespace", "staging", "--prometheus", "--consul", "consul-agent:8500"]
+          image: quay.io/reactiveops/consul8s:v1.0.0
+          ports:
+          - name: prometheus
+            containerPort: 8000
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
           env:
             - name: NAMESPACE
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+
+# Example service configuration with Prometheus Operator
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: consul8s-metrics
+  namespace: staging
+  labels:
+    app: consul8s
+    prometheus_cluster: staging
+spec:
+  selector:
+    app: consul8s
+  ports:
+  - name: http-metrics
+    port: 8000
+    targetPort: prometheus
