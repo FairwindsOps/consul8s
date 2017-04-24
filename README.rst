@@ -96,6 +96,8 @@ metadata:
   annotations:
     consul8s/service.name: foo
     consul8s/service.port_name: http
+    consul8s/service.id: foo_00
+    consul8s/service.remove_registration: "false"
     domainName: foo.example.com
 spec:
   ports:
