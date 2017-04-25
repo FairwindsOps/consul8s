@@ -91,7 +91,7 @@ class ConsulClient(object):
 
     def _consul_registration_doc(self, service, service_id, address, port):
         doc = {
-            'Node': 'Kubernetes',
+            'Node': 'kubernetes-{}'.format(service_id),
             'Address': address,
             'Service': {
                 'ID': service_id,
@@ -104,7 +104,7 @@ class ConsulClient(object):
 
     def _consul_deregistration_doc(self, service, service_id, address, port):
         doc = {
-            'Node': 'Kubernetes',
+            'Node': 'kubernetes-{}'.format(service_id),
             'ServiceID': service_id,
         }
         return doc
