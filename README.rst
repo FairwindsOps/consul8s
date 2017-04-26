@@ -76,6 +76,7 @@ Annotations:
 * `consul8s/service.name` is the name of the service in Consul.
 * `consul8s/service.id` The Consul ServiceID. Defaults to the `consul8s/service.name` if not specified.
 * `consul8s/service.port_name` is the port name in this manifest to register in Consul. The port number will be looked up via this name.
+* `consul8s/service.tags` a comma-separated string of tags to apply to the service
 * `domainName` is the name being registered into Consul.
 
 Removing the Kubernetes service *will not* remove the Consul registration.
@@ -98,6 +99,7 @@ metadata:
     consul8s/service.port_name: http
     consul8s/service.id: foo_00
     consul8s/service.remove_registration: "false"
+    consul8s/service.tags "foo,bar"
     domainName: foo.example.com
 spec:
   ports:

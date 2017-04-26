@@ -82,14 +82,21 @@ class ConsulClient(object):
         endpoint = service_metadata['annotations']['domainName']
         consul_name = service_metadata['annotations']['consul8s/service.name']
         service_id = service_metadata['annotations'].get('consul8s/service.id', consul_name)
+        tags_str = service_metadata['annotations'].get('consul8s/service.tags')
+
+        if tags_str is None:
+            tags = []
+        else:
+            tags = tags_str.split(',')
+
         port_name = service_metadata['annotations']['consul8s/service.port_name']
 
         port_number = self._port_number_from_name(service_spec['ports'], port_name)
 
-        doc = func(consul_name, service_id, endpoint, port_number)
+        doc = func(consul_name, service_id, endpoint, port_number, tags)
         return doc
 
-    def _consul_registration_doc(self, service, service_id, address, port):
+    def _consul_registration_doc(self, service, service_id, address, port, tags):
         doc = {
             'Node': 'kubernetes-{}'.format(service_id),
             'Address': address,
@@ -98,11 +105,12 @@ class ConsulClient(object):
                 'Service': service,
                 'Address': address,
                 'Port': port,
+                'Tags': tags,
             },
         }
         return doc
 
-    def _consul_deregistration_doc(self, service, service_id, address, port):
+    def _consul_deregistration_doc(self, service, service_id, address, port, tags):
         doc = {
             'Node': 'kubernetes-{}'.format(service_id),
             'ServiceID': service_id,
