@@ -52,7 +52,8 @@ def evaluate_for_endpoints(api, namespace, metrics, consul):
     for service in services:
         click.echo('Service: {0}'.format(service.name))
         click.echo('Getting endpoints')
-        endpoints = consul.get_active_endpoints_for_service(service.name)
+        consul_service_name = service.obj['metadata']['annotations']['consul8s/service.name']
+        endpoints = consul.get_active_endpoints_for_service(consul_service_name)
         click.echo('Found endpoints {0}'.format(endpoints))
         doc = kube_generation.create_endpoint_doc(service, endpoints)
         click.echo('Creating endpoint {0}'.format(doc))
