@@ -1,5 +1,6 @@
 import os
 import random
+import socket
 import time
 
 import click
@@ -55,7 +56,9 @@ def evaluate_for_endpoints(api, namespace, metrics, consul):
         consul_service_name = service.obj['metadata']['annotations']['consul8s/service.name']
         endpoints = consul.get_active_endpoints_for_service(consul_service_name)
         click.echo('Found endpoints {0}'.format(endpoints))
-        doc = kube_generation.create_endpoint_doc(service, endpoints)
+        ip_endpoints = list(filter_for_ips(endpoints))
+        click.echo('IP endpoints {0}'.format(ip_endpoints))
+        doc = kube_generation.create_endpoint_doc(service, ip_endpoints)
         click.echo('Creating endpoint {0}'.format(doc))
         try:
             pykube.Endpoint(api, doc).update()
@@ -97,3 +100,19 @@ def get_consul_endpoints_for_service(HTTP, host, service):
             (random.sample(endpoints, 2), 9378)]
 
 
+def filter_for_ips(items):
+    """Generator that yields endpoints of only IPv4 addrs from endpoints
+
+    This can be used to remove non-IPv4 addresses from the (addrs, port)
+    tuples used for endpoints.
+    """
+    for (addresses, port) in items:
+        ips = []
+        for addr in addresses:
+            try:
+                socket.inet_aton(addr)
+            except socket.error:
+                pass
+            else:
+                ips.append(addr)
+        yield (ips, port)
