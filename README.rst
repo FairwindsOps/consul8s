@@ -83,6 +83,8 @@ Removing the Kubernetes service *will not* remove the Consul registration.
 
 Removing the Consul service can be done with an annotation of `consul8s/service.remove_registration: true`. This will remove the registration in Consul to allow the service to drain.
 
+Only IPv4 addresses will sync to Kubernetes. Kubernetes will only accept IP addresses. DNS records will not be resolved into an address when syncing.
+
 
 ```
 ---
