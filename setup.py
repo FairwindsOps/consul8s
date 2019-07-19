@@ -13,7 +13,7 @@ setup(
     url='https://github.com/reactiveops/consul8s',
     license='Apache2',
     author='Philip Cristiano',
-    author_email='philip@reactiveops.com',
+    author_email='philip@fairwinds.com',
     description='Consul integration with Kubernetes',
     long_description=__doc__,
     packages=find_packages(exclude=['tests']),
