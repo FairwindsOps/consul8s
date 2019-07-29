@@ -10,7 +10,7 @@ with open('requirements.txt') as f:
 setup(
     name='consul8s',
     version='0.0.0',
-    url='https://github.com/reactiveops/consul8s',
+    url='https://github.com/FairwindsOps/consul8s',
     license='Apache2',
     author='Philip Cristiano',
     author_email='philip@fairwinds.com',

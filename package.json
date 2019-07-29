@@ -4,11 +4,11 @@
   "description": "Consul/Kube integration",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/reactiveops/consul8s.git"
+    "url": "git+https://github.com/FairwindsOps/consul8s.git"
   },
-  "author": "ReactiveOps",
+  "author": "Fairwinds",
   "license": "Apache2",
   "dependencies": {
-    "k8s-scripts": "git://github.com/reactiveops/k8s-scripts.git#v4.0.1"
+    "k8s-scripts": "git://github.com/FairwindsOps/k8s-scripts.git#v4.0.1"
   }
 }
